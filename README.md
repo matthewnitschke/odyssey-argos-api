@@ -12,25 +12,26 @@ The name of the device will be `ARGOS`, which can be filtered by to retrieve the
 
 ### Characteristics
 
-| Characteristic      | Description                               | Details |
-| ------------------- | ----------------------------------------- | ------- |
-| Temp Set Point      | Target temperature set point (notify)     | [link](/doc/set-point-temp.md) |
-| Boiler Temp Current | Current boiler temperature (notify)       | [link](/doc/boiler-current-temp.md) |
-| Boiler Temp Target  | Target boiler temperature (notify)        | [link](/doc/boiler-target-temp.md) |
+| Characteristic      | Description                               | Details                                |
+| ------------------- | ----------------------------------------- | -------------------------------------- |
+| Set Point Temp      | Current "Brew Set Temp"                   | [link](/doc/set-point-temp.md)         |
+| Boiler Current Temp | Current boiler temperature                | [link](/doc/boiler-current-temp.md)    |
+| Boiler Target Temp  | Target boiler temperature                 | [link](/doc/boiler-target-temp.md)     |
 | Grouphead Temp      | Current grouphead temperature             | [link](/doc/grouphead-current-temp.md) |
-| Fluid Level         | Fluid Level (0 full, 1 empty)             | [link](/doc/fluid-level.md) |
-| Metadata             | Metadata about the current device options | [link](/doc/metadata.md) |
+| Fluid Level         | Whether the boiler needs water            | [link](/doc/fluid-level.md)            |
+| Metadata            | Metadata about the current device options | [link](/doc/metadata.md)               |
 
 There are 2 characteristics that I am still unsure about. PRs are gladly welcome
 
-* `6A521C67-55B5-4384-85C0-6534E63FB09E`
-  * Methods: `Read`, `Notify`
-  * Raw bytes (8)
-  * Seems to change with temperature or pressure changes. Value goes from ~100 to ~1300
+- `6A521C67-55B5-4384-85C0-6534E63FB09E`
+  - Methods: `Read`, `Notify`
+  - Raw bytes (8)
+  - Seems to change with temperature or pressure changes. Value goes from ~100 to ~1300
 
-* `6A521C64-55B5-4384-85C0-6534E63FB09E`
-  * Methods: `Write`, `Notify`
-  * The only write characteristic, unsure of what it does
+- `6A521C64-55B5-4384-85C0-6534E63FB09E`
+  - Methods: `Write`, `Notify`
+  - The only write characteristic, unsure of what it does
+  - Could have something to do with "Unlocked Features"? (modifiable via app? `Reset Unlocked Features`)
 
 ## Example App
 

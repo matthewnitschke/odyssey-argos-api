@@ -27,11 +27,12 @@ There are 2 characteristics that I am still unsure about. PRs are gladly welcome
   - Methods: `Read`, `Notify`
   - Raw bytes (8)
   - Seems to change with temperature or pressure changes. Value goes from ~100 to ~1300
+  - _Might_ be a resistance measurement within the boiler, used an indication for whether the machine should be descaled or not
 
 - `6A521C64-55B5-4384-85C0-6534E63FB09E`
   - Methods: `Write`, `Notify`
-  - The only write characteristic, unsure of what it does
-  - Could have something to do with "Unlocked Features"? (modifiable via app? `Reset Unlocked Features`)
+  - The only write characteristic
+  - More than likely the way of updating the [metadata](/doc/metadata.md) on the machine. I haven't discovered the expected format yet 
 
 ## Example App
 

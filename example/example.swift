@@ -7,6 +7,7 @@ let boilerCurrentUUID = CBUUID(string: "6a521c61-55b5-4384-85c0-6534e63fb09e")
 let boilerTargetUUID = CBUUID(string: "6a521c66-55b5-4384-85c0-6534e63fb09e")
 let groupheadCurrentUUID = CBUUID(string: "6a521c62-55b5-4384-85c0-6534e63fb09e")
 let fluidLevelUUID = CBUUID(string: "6a521c63-55b5-4384-85c0-6534e63fb09e")
+let metadataUUID = CBUUID(string: "6a521c65-55b5-4384-85c0-6534e63fb09e")
 
 let app = NSApplication.shared
 let delegate = AppDelegate()
@@ -24,19 +25,25 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var setPoint: Double = 0
     var groupheadCurrent: Double = 0
     var fluidLevel: UInt32 = 0
+    var metadata: [String: Any] = [:]
 
     func applicationDidFinishLaunching(_ notification: Notification) {                        
       centralManager = CBCentralManager(delegate: self, queue: .main)
     }
 
     func updateOutput() {
-      updateMultilineOutput(lines: [
+      var lines = [
         "  * Set Point: \(setPoint)",
         "  * Boiler Current: \(boilerCurrent)",
         "  * Boiler Target: \(boilerTarget)",
         "  * Grouphead Current: \(groupheadCurrent)",
-        "  * Fluid Level: \(fluidLevel == 0 ? "OK" : "Needs Water")"
-      ])
+        "  * Fluid Level: \(fluidLevel == 0 ? "OK" : "Needs Water")",
+        "  * Metadata:"
+      ]
+      for (key, value) in metadata.sorted(by: { $0.key < $1.key }) {
+        lines.append("      \(key): \(value)")
+      }
+      updateMultilineOutput(lines: lines)
     }
 
     var isFirstOutput = true
@@ -93,7 +100,7 @@ extension AppDelegate: CBPeripheralDelegate {
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
         guard let services = peripheral.services else { return }
         for service in services {
-            peripheral.discoverCharacteristics([setPointUUID, boilerCurrentUUID, boilerTargetUUID, groupheadCurrentUUID, fluidLevelUUID], for: service)
+            peripheral.discoverCharacteristics([setPointUUID, boilerCurrentUUID, boilerTargetUUID, groupheadCurrentUUID, fluidLevelUUID, metadataUUID], for: service)
         }
     }
     
@@ -101,11 +108,22 @@ extension AppDelegate: CBPeripheralDelegate {
         guard let characteristics = service.characteristics else { return }
         for characteristic in characteristics {
             peripheral.setNotifyValue(true, for: characteristic)
+            if characteristic.uuid == metadataUUID {
+                peripheral.readValue(for: characteristic)
+            }
         }
     }
     
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
         guard let data = characteristic.value, data.count >= 4 else { return }
+        
+        if characteristic.uuid == metadataUUID {
+            if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+                metadata = json
+            }
+            updateOutput()
+            return
+        }
         
         if data.count >= 8 {
           var temp = data.withUnsafeBytes { $0.load(as: Double.self) }
